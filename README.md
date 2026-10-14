@@ -8,6 +8,16 @@ This repository contains a Jupyter Notebook analysing an extract of the ChEMBL d
 
 The core question driving the analysis: **do simple molecular descriptors (AlogP, Molecular Weight) predict receptor potency in this dataset?** In practice, most of the analytical effort went into diagnosing and resolving data quality issues in the raw ChEMBL export before that question could be answered.
 
+## Key Findings
+
+**Short answer to the core question: no.** Once the data was cleaned, AlogP and molecular weight explained very little of the variation in potency.
+
+- **The raw export mixes incompatible assays.** It contains three distinct assays, and two of them measure opposite receptor pharmacology (agonist vs. inverse agonist). Pooling them would compare numbers that don't mean the same thing, so the analysis uses only the largest single assay.
+- **A cluster of potency values is a placeholder, not a measurement.** A large group of compounds share exactly the same Standard Value (28183.8 nM). This turned out to be an artifact rather than real data, and those rows are excluded.
+- **Some columns overlap.** `Value` and `Standard Value` are the same values in different units. `#RO5 Violations` partly overlaps with AlogP and molecular weight, since both feed into the Rule of Five, but it also reflects H-bond donor and acceptor counts that aren't otherwise in the dataset.
+- **AlogP acts as a threshold rather than a trend.** Active compounds are markedly more common above an AlogP of about 2, and there's a slight preference for higher molecular weight. Beyond that, the structure–activity relationship (SAR) is flat when judged by these descriptors.
+- **Potency is probably driven by specific structural features.** Simple whole-molecule descriptors don't capture these, so answering the question properly would need structure-level features (e.g. substructures or fingerprints).
+
 ## Data Source
 
 EBI-ChEMBL database — Target CHEMBL1784
@@ -25,12 +35,10 @@ The analysis follows a five-step EDA methodology, run in sequence in the main no
 4. **Multivariate analysis** - relationship between AlogP, Molecular Weight, and potency across the cleaned dataset.
 5. **Pipeline integrity diagnostics** - audit of constant/zero-variance columns, derived/redundant columns, sparse columns, and a set of reusable schema-verification checks.
 
-AlogP shows a gating effect where activity appears to be markedly more likely at > ca. 2 and there is a slight preference for higher molecular weight compounds. But generally the SAR appears to be flat when judged by these simple molecular descriptors. It is likely that specific structural changes are driving Standard Value (potency), which are not captured in the dataset as it is.
-
 ## Project Structure
 
 ```
-Week_9_ChEMBL_EDA/
+chembl__glp1_eda/
 ├── .gitignore
 ├── README.md
 ├── notebooks/
